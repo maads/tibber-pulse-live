@@ -10,12 +10,19 @@ const queries = require('./queries'),
 let _clients = [];
 
 // TODO extract address
-const mqttClient = mqtt.connect('mqtt://192.168.10.157:1883');
+const mqttClient = mqtt.connect(process.env.TIBBER_MQTT);
+let isMqttConnected = false;
 
 mqttClient.on('connect', function () {
-    console.log('connected to mqtt server');
+    console.log('connected to mqtt server: ', process.env.TIBBER_MQTT);
+    isMqttConnected = true;
 });
-
+mqttClient.on('close', function () {
+    isMqttConnected = false;
+});
+mqttClient.on('error', function () {
+    isMqttConnected = false;
+});
 function getDefaultToken() {
     return 'd1007ead2dc84a2b82f0de19451c5fb22112f7ae11d19bf2bedb224a003ff74a';
 }
@@ -76,12 +83,17 @@ function subscribeToLive(token, homeId, callback) {
 }
 
 (function () {
-    const token = process.env.TOKEN || getDefaultToken();
+    const token = process.env.TIBBER_TOKEN || getDefaultToken();
+
     getHomes(token).then(function (res) {
+
+        // TODO check if live measurements is enabled for selected home
+
         subscribeToLive(token, res.viewer.homes[0].id, function (result) {
             console.log(result);
-            // TODO extract mqtt topic
-            mqttClient.publish('ams', JSON.stringify(result));
+            if (isMqttConnected) {
+                mqttClient.publish(process.env.TIBBER_MQTT_TOPIC || 'ams', JSON.stringify(result));
+            }
         })
     });
 })();
