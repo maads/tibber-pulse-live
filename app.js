@@ -79,17 +79,22 @@ function subscribeToLive(token, homeId, callback) {
     wsClient.subscribe({
         query: queries.getSubscriptionQuery(homeId),
         variables: {}
-    }).subscribe(callback, console.error);
+    }).subscribe(callback, function (err) {
+        console.log('error', err);
+    });
 }
 
 (function () {
     const token = process.env.TIBBER_TOKEN || getDefaultToken();
-
     getHomes(token).then(function (res) {
-
-        // TODO check if live measurements is enabled for selected home
-
-        subscribeToLive(token, res.viewer.homes[0].id, function (result) {
+        const primaryHome = res.viewer.homes[0];
+        const isPulseEnabled = primaryHome.features.realTimeConsumptionEnabled;
+        console.log('pulse enabled', isPulseEnabled);
+        if (!isPulseEnabled) {
+            console.error('Pulse is not enabled in this home.');
+            return;
+        }
+        subscribeToLive(token, primaryHome.id, function (result) {
             console.log(result);
             if (isMqttConnected) {
                 mqttClient.publish(process.env.TIBBER_MQTT_TOPIC || 'ams', JSON.stringify(result));

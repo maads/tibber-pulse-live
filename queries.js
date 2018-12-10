@@ -7,12 +7,16 @@ module.exports = {
 
 function getHomesQuery() {
   return `{
-      viewer {
-        homes {
-          id
+    viewer {
+      homes {
+        id
+        features {
+          realTimeConsumptionEnabled
         }
       }
-    }`;
+    }
+  }
+  `;
 }
 
 function getSubscriptionQuery(homeId) {
