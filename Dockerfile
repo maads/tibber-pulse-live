@@ -1,16 +1,15 @@
-FROM node:8
+FROM alpine:3.7
+RUN apk add --no-cache supervisor nodejs nodejs-npm
+RUN mkdir -p /var/log/supervisor
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY package*.json ./
-
 RUN npm install
-# If you are building your code for production
-# RUN npm install --only=production
 
-# Bundle app source
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+COPY run.sh /usr/local/bin/
+RUN /bin/chmod +x /usr/local/bin/run.sh
+
 COPY . .
 
-# EXPOSE 8080
-CMD [ "npm", "start" ]
+CMD ["/usr/bin/supervisord"]

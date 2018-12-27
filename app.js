@@ -9,7 +9,6 @@ const queries = require('./queries'),
 
 let _clients = [];
 
-// TODO extract address
 const mqttClient = mqtt.connect(process.env.TIBBER_MQTT);
 let isMqttConnected = false;
 
@@ -85,6 +84,10 @@ function subscribeToLive(token, homeId, callback) {
 }
 
 (function () {
+    process.on('uncaughtException', function (e) {
+        console.log(e);
+        process.exit(1);
+    });
     const token = process.env.TIBBER_TOKEN || getDefaultToken();
     getHomes(token).then(function (res) {
         const primaryHome = res.viewer.homes[0];
