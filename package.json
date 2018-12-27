@@ -1,6 +1,6 @@
 {
   "name": "tibber-live",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Tibber Pulse live measurements",
   "main": "app.js",
   "scripts": {
