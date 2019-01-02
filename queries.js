@@ -31,6 +31,12 @@ function getSubscriptionQuery(homeId) {
                 minPower
                 averagePower
                 maxPower
+                voltagePhase1
+                voltagePhase2
+                voltagePhase3
+                currentPhase1
+                currentPhase2
+                currentPhase3
               }
             }`;
 }

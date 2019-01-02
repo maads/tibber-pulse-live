@@ -5,7 +5,18 @@ const queries = require('./queries'),
     { GraphQLClient } = require('graphql-request'),
     { WebSocketLink } = require("apollo-link-ws"),
     { InMemoryCache } = require("apollo-cache-inmemory"),
-    mqtt = require('mqtt');
+    mqtt = require('mqtt'),
+    fs = require('fs'),
+    util = require('util');
+
+var logFile = fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' });
+var logStdout = process.stdout;
+
+console.log = function (d) {
+    const now = new Date().toISOString();
+    logFile.write(now + '- ' + util.format(d) + '\n');
+    logStdout.write(now + '- ' + util.format(d) + '\n');
+};
 
 let _clients = [];
 
@@ -23,6 +34,7 @@ mqttClient.on('error', function () {
     isMqttConnected = false;
 });
 function getDefaultToken() {
+    console.log('using default token');
     return 'd1007ead2dc84a2b82f0de19451c5fb22112f7ae11d19bf2bedb224a003ff74a';
 }
 
@@ -73,13 +85,14 @@ function subscribeToLive(token, homeId, callback) {
     const wsClient = new ApolloClient({
         link: wsLink,
         cache: new InMemoryCache()
+
     });
 
     wsClient.subscribe({
         query: queries.getSubscriptionQuery(homeId),
         variables: {}
     }).subscribe(callback, function (err) {
-        console.log('error', err);
+        console.log('subscribe error', err);
     });
 }
 
@@ -98,7 +111,7 @@ function subscribeToLive(token, homeId, callback) {
             return;
         }
         subscribeToLive(token, primaryHome.id, function (result) {
-            console.log(result);
+            console.info(result);
             if (isMqttConnected) {
                 mqttClient.publish(process.env.TIBBER_MQTT_TOPIC || 'ams', JSON.stringify(result));
             }

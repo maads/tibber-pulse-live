@@ -1,5 +1,5 @@
 FROM alpine:3.7
-RUN apk add --no-cache supervisor nodejs nodejs-npm
+RUN apk add --no-cache supervisor nodejs nodejs-npm bash
 RUN mkdir -p /var/log/supervisor
 
 COPY package*.json ./
