@@ -24,7 +24,7 @@ const mqttClient = mqtt.connect(process.env.TIBBER_MQTT);
 let isMqttConnected = false;
 
 mqttClient.on('connect', function () {
-    console.log('connected to mqtt server: ', process.env.TIBBER_MQTT);
+    console.log('connected to mqtt server: ' + process.env.TIBBER_MQTT);
     isMqttConnected = true;
 });
 mqttClient.on('close', function () {
