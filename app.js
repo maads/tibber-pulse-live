@@ -12,6 +12,8 @@ const queries = require('./queries'),
 var logFile = fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' });
 var logStdout = process.stdout;
 
+let timeout = new Date().getTime();
+
 console.log = function (d) {
     const now = new Date().toISOString();
     logFile.write(now + '- ' + util.format(d) + '\n');
@@ -101,6 +103,15 @@ function subscribeToLive(token, homeId, callback) {
         console.log(e);
         process.exit(1);
     });
+
+    setInterval(() => {
+        const now = new Date().getTime();
+        if ((now - timeout) > (1000 * 60)) {
+            console.log('more than 1 minute since last update. exiting to try again.')
+            process.exit(1);
+        }
+    }, 2000);
+
     const token = process.env.TIBBER_TOKEN || getDefaultToken();
     getHomes(token).then(function (res) {
         const primaryHome = res.viewer.homes[0];
@@ -112,6 +123,7 @@ function subscribeToLive(token, homeId, callback) {
         }
         subscribeToLive(token, primaryHome.id, function (result) {
             console.info(result);
+            timeout = new Date().getTime();
             if (isMqttConnected) {
                 mqttClient.publish(process.env.TIBBER_MQTT_TOPIC || 'ams', JSON.stringify(result));
             }
