@@ -16,4 +16,5 @@ env.env
     TIBBER_MQTT=mqtt://ip:port
     # TIBBER_MQTT_TOPIC=ams
     # TIBBER_TOKEN=xxxx
-    
+
+Obtain token from https://developer.tibber.com/    
