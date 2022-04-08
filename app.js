@@ -37,7 +37,7 @@ mqttClient.on('error', function () {
 });
 function getDefaultToken() {
     console.log('using default token');
-    return 'd1007ead2dc84a2b82f0de19451c5fb22112f7ae11d19bf2bedb224a003ff74a';
+    return '476c477d8a039529478ebd690d35ddd80e3308ffc49b59c65b142321aee963a4';
 }
 
 function getClient(token) {
